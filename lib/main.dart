@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/details_screen.dart';
 
+String emailCadastrado = '';
+String senhaCadastrada = '';
+
 void main() {
-    runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
+  runApp(
 
-  @override
-  Widget build(BuildContext context) {
-
-    return MaterialApp(
+    MaterialApp(
 
       debugShowCheckedModeBanner: false,
 
       title: 'MedLife',
 
-      initialRoute: '/',
+      initialRoute: '/login',
 
       routes: {
+
+        '/login': (context) => LoginScreen(),
+
+        '/register': (context) => RegisterScreen(),
 
         '/': (context) => HomeScreen(),
 
         '/details': (context) => DetailsScreen(),
-
       },
-    );
-  }
+    ),
+  );
 }

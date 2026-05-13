@@ -8,19 +8,63 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  TextEditingController nomeController = TextEditingController();
+  TextEditingController nomeController =
+      TextEditingController();
 
-  TextEditingController quantidadeController = TextEditingController();
+  TextEditingController quantidadeController =
+      TextEditingController();
 
-  TextEditingController horarioController = TextEditingController();
+  TextEditingController horario1Controller =
+      TextEditingController();
+
+  TextEditingController horario2Controller =
+      TextEditingController();
+
+  TextEditingController horario3Controller =
+      TextEditingController();
+
+  TextEditingController motivoController =
+      TextEditingController();
 
   List<Map<String, dynamic>> remedios = [];
+
+  bool mostrarHorario2 = false;
+
+  bool mostrarHorario3 = false;
+
+  List<String> diasSemana = [
+
+    'Seg',
+
+    'Ter',
+
+    'Qua',
+
+    'Qui',
+
+    'Sex',
+
+    'Sáb',
+
+    'Dom',
+  ];
+
+  List<bool> diasSelecionados = [
+
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
 
   void salvarRemedio() {
 
     if (nomeController.text.isEmpty ||
         quantidadeController.text.isEmpty ||
-        horarioController.text.isEmpty) {
+        horario1Controller.text.isEmpty) {
 
       return;
     }
@@ -33,15 +77,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
         'quantidade': quantidadeController.text,
 
-        'horario': horarioController.text,
+        'horario1': horario1Controller.text,
+
+        'horario2': horario2Controller.text,
+
+        'horario3': horario3Controller.text,
+
+        'motivo': motivoController.text,
 
         'tomou': false,
+
+        'dias': List.from(diasSelecionados),
       });
     });
 
     nomeController.clear();
+
     quantidadeController.clear();
-    horarioController.clear();
+
+    horario1Controller.clear();
+
+    horario2Controller.clear();
+
+    horario3Controller.clear();
+
+    motivoController.clear();
+
+    setState(() {
+
+      mostrarHorario2 = false;
+
+      mostrarHorario3 = false;
+
+      diasSelecionados = [
+
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+      ];
+    });
   }
 
   @override
@@ -49,291 +127,392 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
 
-      backgroundColor: Color(0xfff5f5f5),
-
       appBar: AppBar(
 
-        title: Text(
-          'MedLife',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
+        title: Text('MedLife'),
+      ),
+
+      drawer: Drawer(
+
+        child: Column(
+
+          children: [
+
+            SizedBox(height: 50),
+
+            Icon(
+              Icons.medication,
+              size: 80,
+              color: Colors.purple,
+            ),
+
+            SizedBox(height: 10),
+
+            Text(
+
+              "MedLife",
+
+              style: TextStyle(
+
+                fontSize: 30,
+
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            Divider(),
+
+            ListTile(
+
+              title: Text("Início"),
+
+              onTap: () {
+
+                Navigator.pushNamed(
+                  context,
+                  '/',
+                );
+              },
+            ),
+
+            Divider(),
+
+            Expanded(
+
+              child: ListView.builder(
+
+                itemCount: remedios.length,
+
+                itemBuilder: (context, index) {
+
+                  return ListTile(
+
+                    title: Text(
+                      remedios[index]['nome'],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-
-        centerTitle: true,
-
-        backgroundColor: Colors.purple,
-
-        elevation: 0,
       ),
 
       body: Padding(
 
         padding: EdgeInsets.all(20),
 
-        child: Column(
+        child: SingleChildScrollView(
 
-          children: [
+          child: Column(
 
-            Container(
+            children: [
 
-              padding: EdgeInsets.all(20),
+              Center(
 
-              decoration: BoxDecoration(
+                child: Column(
 
-                color: Colors.white,
+                  children: [
 
-                borderRadius: BorderRadius.circular(20),
+                    Icon(
+                      Icons.medication,
+                      size: 100,
+                      color: Colors.purple,
+                    ),
 
-                boxShadow: [
+                    SizedBox(height: 10),
 
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
+                    Text(
 
-              child: Column(
+                      'MedLife',
 
-                children: [
+                      style: TextStyle(
 
-                  TextField(
+                        fontSize: 35,
 
-                    controller: nomeController,
-
-                    decoration: InputDecoration(
-
-                      labelText: 'Nome do Remédio',
-
-                      prefixIcon: Icon(Icons.medication),
-
-                      border: OutlineInputBorder(
-
-                        borderRadius: BorderRadius.circular(15),
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 15),
+                    Text(
+                      'Controle seus remédios',
+                    ),
+                  ],
+                ),
+              ),
 
-                  Row(
+              SizedBox(height: 20),
+
+              Card(
+
+                elevation: 5,
+
+                child: Padding(
+
+                  padding: EdgeInsets.all(20),
+
+                  child: Column(
 
                     children: [
 
-                      Expanded(
+                      TextField(
 
-                        child: TextField(
+                        controller: nomeController,
 
-                          controller: quantidadeController,
+                        decoration: InputDecoration(
 
-                          decoration: InputDecoration(
-
-                            labelText: 'Quantidade',
-
-                            prefixIcon: Icon(Icons.numbers),
-
-                            border: OutlineInputBorder(
-
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
+                          labelText:
+                              'Nome do Remédio',
                         ),
                       ),
 
-                      SizedBox(width: 10),
+                      SizedBox(height: 15),
 
-                      Expanded(
+                      TextField(
 
-                        child: TextField(
+                        controller:
+                            quantidadeController,
 
-                          controller: horarioController,
+                        decoration: InputDecoration(
 
-                          decoration: InputDecoration(
+                          labelText: 'Quantidade',
+                        ),
+                      ),
 
-                            labelText: 'Horário',
+                      SizedBox(height: 15),
 
-                            prefixIcon: Icon(Icons.access_time),
+                      TextField(
 
-                            border: OutlineInputBorder(
+                        controller:
+                            motivoController,
 
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
+                        decoration: InputDecoration(
+
+                          labelText:
+                              'Motivo do uso',
+                        ),
+                      ),
+
+                      SizedBox(height: 15),
+
+                      TextField(
+
+                        controller:
+                            horario1Controller,
+
+                        decoration: InputDecoration(
+
+                          labelText:
+                              'Horário 1 (00:00)',
+                        ),
+                      ),
+
+                      SizedBox(height: 15),
+
+                      mostrarHorario2
+
+                          ? TextField(
+
+                              controller:
+                                  horario2Controller,
+
+                              decoration:
+                                  InputDecoration(
+
+                                labelText:
+                                    'Horário 2 (00:00)',
+                              ),
+                            )
+
+                          : Container(),
+
+                      SizedBox(height: 15),
+
+                      mostrarHorario3
+
+                          ? TextField(
+
+                              controller:
+                                  horario3Controller,
+
+                              decoration:
+                                  InputDecoration(
+
+                                labelText:
+                                    'Horário 3 (00:00)',
+                              ),
+                            )
+
+                          : Container(),
+
+                      SizedBox(height: 15),
+
+                      ElevatedButton(
+
+                        onPressed: () {
+
+                          setState(() {
+
+                            if (!mostrarHorario2) {
+
+                              mostrarHorario2 = true;
+                            }
+
+                            else if (!mostrarHorario3) {
+
+                              mostrarHorario3 = true;
+                            }
+                          });
+                        },
+
+                        child: Text(
+                          'Adicionar Horário',
+                        ),
+                      ),
+
+                      SizedBox(height: 20),
+
+                      Text(
+
+                        'Dias da Semana',
+
+                        style: TextStyle(
+
+                          fontSize: 20,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      SizedBox(height: 10),
+
+                      Row(
+
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceAround,
+
+                        children: List.generate(
+
+                          diasSemana.length,
+
+                          (index) {
+
+                            return Column(
+
+                              children: [
+
+                                Text(
+                                  diasSemana[index],
+                                ),
+
+                                Checkbox(
+
+                                  value:
+                                      diasSelecionados[index],
+
+                                  onChanged: (value) {
+
+                                    setState(() {
+
+                                      diasSelecionados[index] =
+                                          value!;
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+
+                      SizedBox(height: 20),
+
+                      ElevatedButton(
+
+                        onPressed: salvarRemedio,
+
+                        child: Text(
+                          'Salvar Remédio',
                         ),
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 20),
-
-                  SizedBox(
-
-                    width: double.infinity,
-
-                    height: 50,
-
-                    child: ElevatedButton(
-
-                      onPressed: salvarRemedio,
-
-                      style: ElevatedButton.styleFrom(
-
-                        backgroundColor: Colors.purple,
-
-                        shape: RoundedRectangleBorder(
-
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-
-                      child: Text(
-
-                        'Salvar Remédio',
-
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 20),
-
-            Align(
-
-              alignment: Alignment.centerLeft,
-
-              child: Text(
-
-                'Meus Remédios',
-
-                style: TextStyle(
-
-                  fontSize: 24,
-
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
 
-            SizedBox(height: 10),
+              SizedBox(height: 20),
 
-            Expanded(
+              ListView.builder(
 
-              child: remedios.isEmpty
+                shrinkWrap: true,
 
-                  ? Center(
+                physics:
+                    NeverScrollableScrollPhysics(),
 
-                      child: Text(
+                itemCount: remedios.length,
 
-                        'Nenhum remédio cadastrado',
+                itemBuilder: (context, index) {
 
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
+                  return Card(
+
+                    child: ListTile(
+
+                      title: Text(
+                        remedios[index]['nome'],
                       ),
-                    )
 
-                  : ListView.builder(
+                      subtitle: Text(
 
-                      itemCount: remedios.length,
+                        'Motivo: ${remedios[index]['motivo']}',
+                      ),
 
-                      itemBuilder: (context, index) {
+                      trailing: Row(
 
-                        return Container(
+                        mainAxisSize: MainAxisSize.min,
 
-                          margin: EdgeInsets.only(bottom: 15),
+                        children: [
 
-                          decoration: BoxDecoration(
+                          Checkbox(
 
-                            color: Colors.white,
+                            value:
+                                remedios[index]['tomou'],
 
-                            borderRadius: BorderRadius.circular(20),
+                            onChanged: (value) {
 
-                            boxShadow: [
+                              setState(() {
 
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 5,
-                              ),
-                            ],
+                                remedios[index]['tomou'] =
+                                    value;
+                              });
+                            },
                           ),
 
-                          child: ListTile(
+                          TextButton(
 
-                            contentPadding: EdgeInsets.all(15),
+                            onPressed: () {
 
-                            leading: CircleAvatar(
+                              Navigator.pushNamed(
 
-                              backgroundColor: Colors.purple,
+                                context,
 
-                              child: Icon(
-                                Icons.medication,
-                                color: Colors.white,
-                              ),
-                            ),
+                                '/details',
 
-                            title: Text(
+                                arguments:
+                                    remedios[index],
+                              );
+                            },
 
-                              remedios[index]['nome'],
-
-                              style: TextStyle(
-
-                                fontSize: 20,
-
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            subtitle: Padding(
-
-                              padding: EdgeInsets.only(top: 8),
-
-                              child: Column(
-
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-
-                                children: [
-
-                                  Text(
-                                    'Quantidade: ${remedios[index]['quantidade']}',
-                                  ),
-
-                                  Text(
-                                    'Horário: ${remedios[index]['horario']}',
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            trailing: Checkbox(
-
-                              value: remedios[index]['tomou'],
-
-                              activeColor: Colors.green,
-
-                              onChanged: (value) {
-
-                                setState(() {
-
-                                  remedios[index]['tomou'] = value;
-                                });
-                              },
-                            ),
+                            child: Text('Ver Mais'),
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
