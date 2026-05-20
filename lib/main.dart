@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/details_screen.dart';
+import 'screens/registro_screen.dart';
+import 'screens/inicio_screen.dart';
+import 'screens/detalhes_screen.dart';
 
 String emailCadastrado = '';
 String senhaCadastrada = '';
@@ -11,7 +11,6 @@ String senhaCadastrada = '';
 void main() {
 
   runApp(
-
     MaterialApp(
 
       debugShowCheckedModeBanner: false,
@@ -20,15 +19,16 @@ void main() {
 
       initialRoute: '/login',
 
+//navegação
       routes: {
 
-        '/login': (context) => LoginScreen(),
+        '/login': (context) =>  LoginScreen(),
 
-        '/register': (context) => RegisterScreen(),
+        '/registro': (context) => RegistroScreen(),
 
-        '/': (context) => HomeScreen(),
+        '/': (context) => InicioScreen(),
 
-        '/details': (context) => DetailsScreen(),
+        '/detalhes': (context) => DetalhesScreen(),
       },
     ),
   );
