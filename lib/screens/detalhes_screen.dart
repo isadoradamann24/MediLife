@@ -1,91 +1,208 @@
 import 'package:flutter/material.dart';
 
-class DetalhesScreen extends StatelessWidget {
+class DetalhesScreen extends StatefulWidget {
+  const DetalhesScreen({super.key});
+
+  @override
+  State<DetalhesScreen> createState() => _DetalhesScreenState();
+}
+
+class _DetalhesScreenState extends State<DetalhesScreen> {
+  late Map<String, dynamic> remedio;
+
+  final List<String> diasSemana = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo',
+  ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    remedio = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    final remedio = ModalRoute.of(context)!
-        .settings
-        .arguments
-        as Map<String, dynamic>;
-
-    List<String> diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo', ];
-
     return Scaffold(
-      backgroundColor:Color.fromARGB(255, 235, 245, 245),
+      backgroundColor: const Color.fromARGB(255, 235, 245, 245),
 
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 0, 90, 110),
-        title: Text('Detalhes do Remédio'),
+        backgroundColor: const Color.fromARGB(255, 0, 90, 110),
+        title: const Text("Detalhes do Remédio"),
       ),
-//layout
-      body: Center(child: Padding(
-        padding: EdgeInsets.all(25),
-//layout
-          child: Column(mainAxisAlignment:MainAxisAlignment.center,
 
-            children: [Icon(Icons.medication,
-              size: 100,
-              color:Color.fromARGB(255, 0, 100, 120),
-              ),
-//layout
-              SizedBox(height: 20),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(25),
 
-              Text(remedio['nome'],
-
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight:FontWeight.bold,
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.medication,
+                  size: 100,
+                  color: Color.fromARGB(255, 0, 100, 120),
                 ),
-              ),
-              SizedBox(height: 20),
 
-              Text('Quantidade: ${remedio['quantidade']}'),
-              SizedBox(height: 10),
+                const SizedBox(height: 20),
 
-              Text('Horário: ${remedio['horario']}'),
-              SizedBox(height: 10),
+                Text(
+                  remedio['nome'],
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 0, 90, 110),
+                  ),
+                ),
 
-              Text('Motivo: ${remedio['motivo']}'),
-              SizedBox(height: 20),
+                const SizedBox(height: 25),
 
-              Column(children: List.generate(diasSemana.length,(index) {
-//layout
-                    return Row(mainAxisAlignment:MainAxisAlignment.center,
-
-                      children: [Icon(remedio['dias'][index] ? Icons.check_circle : Icons.cancel,
-
-                          color: remedio['dias'] [index] ? Colors.green : Colors.red,
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Quantidade: ${remedio['quantidade']}",
+                          style: const TextStyle(fontSize: 18),
                         ),
 
-                        SizedBox(width: 10),
+                        const SizedBox(height: 12),
 
-                        Text(diasSemana[index]),
+                        Text(
+                          "Horário: ${remedio['horario']}",
+                          style: const TextStyle(fontSize: 18),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Text(
+                          "Motivo: ${remedio['motivo']}",
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ],
-                    );
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                const Text(
+                  "Dias da Semana",
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                Column(
+                  children: List.generate(
+                    diasSemana.length,
+                    (index) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            remedio['dias'][index]
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color: remedio['dias'][index]
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          Text(
+                            diasSemana[index],
+                            style: const TextStyle(fontSize: 17),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                SwitchListTile(
+                  title: const Text(
+                    "Remédio tomado?",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  subtitle: Text(
+                    remedio['tomou']
+                        ? "Sim, já tomei."
+                        : "Ainda não tomei.",
+                  ),
+
+                  value: remedio['tomou'],
+
+                  activeColor: Colors.green,
+
+                  onChanged: (valor) {
+                    setState(() {
+                      remedio['tomou'] = valor;
+                    });
                   },
                 ),
-              ),
 
-              SizedBox(height: 20),
-//input
-              ElevatedButton(
+                const SizedBox(height: 20),
 
-                style:ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+
+                  decoration: BoxDecoration(
+                    color: remedio['tomou']
+                        ? Colors.green.shade100
+                        : Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+
+                  child: Text(
+                    remedio['tomou']
+                        ? "✅ Remédio já tomado"
+                        : "❌ Remédio ainda não tomado",
+
+                    textAlign: TextAlign.center,
+
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: remedio['tomou']
+                          ? Colors.green
+                          : Colors.red,
+                    ),
+                  ),
                 ),
 
-                onPressed: () {Navigator.pop(context);
-                },
+                const SizedBox(height: 30),
 
-                child: Text('Voltar',
+                SizedBox(
+                  width: 220,
 
-                  style: TextStyle(
-                      color:Colors.white),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                    ),
+
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+
+                    child: const Text(
+                      "Voltar",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
