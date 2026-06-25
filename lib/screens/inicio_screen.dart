@@ -1,232 +1,324 @@
 import 'package:flutter/material.dart';
 
 class InicioScreen extends StatefulWidget {
+  const InicioScreen({super.key});
 
   @override
   State<InicioScreen> createState() => _InicioScreenState();
 }
 
 class _InicioScreenState extends State<InicioScreen> {
-
   TextEditingController nomeController = TextEditingController();
-
   TextEditingController quantidadeController = TextEditingController();
-  TextEditingController horarioController =  TextEditingController();
+  TextEditingController horarioController = TextEditingController();
   TextEditingController motivoController = TextEditingController();
-  List<String> diasSemana = ['Seg','Ter','Qua','Qui','Sex', 'Sáb','Dom',];
-  List<bool> diasSelecionados = [false, false, false, false, false, false, false, ];
 
-  void salvarRemedio() {
+  List<Map<String, dynamic>> remedios = [];
+
+  List<String> diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+  List<bool> diasSelecionados = List.filled(7, false);
+
+  bool aumentarBotao = false;
+
+  int fraseAtual = 0;
+
+  final List<String> frases = [
+    "💙 Cuidar da saúde é cuidar da vida.",
+    "💊 Não esqueça seu medicamento de hoje.",
+    "😊 Pequenos cuidados fazem grande diferença.",
+    "❤️ Sua saúde merece atenção todos os dias."
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 4));
+
+      if (!mounted) return false;
+
+      setState(() {
+        fraseAtual = (fraseAtual + 1) % frases.length;
+      });
+
+      return true;
+    });
+  }
+
+  void salvarRemedio() async {
+    // 🔴 validação campos
+    if (nomeController.text.isEmpty ||
+        quantidadeController.text.isEmpty ||
+        horarioController.text.isEmpty ||
+        motivoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Preencha todos os campos")),
+      );
+      return;
+    }
+
+    // 🔴 validação dias
+    if (!diasSelecionados.contains(true)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Selecione pelo menos um dia")),
+      );
+      return;
+    }
+
+    setState(() {
+      aumentarBotao = true;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 180));
+
+    setState(() {
+      aumentarBotao = false;
+    });
+
     Map<String, dynamic> remedio = {
-
       'nome': nomeController.text,
       'quantidade': quantidadeController.text,
       'horario': horarioController.text,
       'motivo': motivoController.text,
-      'dias': List.from(diasSelecionados),
+      'dias': List<bool>.from(diasSelecionados),
       'tomou': false,
     };
 
-//navegação
-    Navigator.pushNamed(context, '/detalhes', arguments: remedio,
+    setState(() {
+      remedios.add(remedio);
+    });
+
+    // limpar campos
+    nomeController.clear();
+    quantidadeController.clear();
+    horarioController.clear();
+    motivoController.clear();
+    diasSelecionados = List.filled(7, false);
+
+    Navigator.pushNamed(
+      context,
+      '/detalhes',
+      arguments: remedio,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:Color.fromARGB(255, 235, 245, 245),
+      backgroundColor: const Color.fromARGB(255, 235, 245, 245),
 
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 0, 90, 110),
-        title: Text('MedLife'),
+        backgroundColor: const Color.fromARGB(255, 0, 90, 110),
+        title: const Text("MedLife"),
       ),
 
       drawer: Drawer(
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            const Icon(Icons.medication, size: 85, color: Colors.teal),
 
-        child: Column(children: [
-
-            SizedBox(height: 50),
-            Icon(Icons.medication,
-              size: 85,
-              color: Colors.teal,
-            ),
-
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
 
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Início'),
-
-              onTap: () {Navigator.pushNamed(context, '/');
+              leading: const Icon(Icons.home),
+              title: const Text("Início"),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/');
               },
             ),
 
-            Divider(),
+            const Divider(),
 
             ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text("Login"),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
 
-              leading: Icon(Icons.login),
+            const Divider(),
 
-              title: Text('Login'),
-
-              onTap: () {Navigator.pushNamed(context,'/login');
+            ListTile(
+              leading: const Icon(Icons.analytics),
+              title: const Text("Estatísticas"),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/estatisticas',
+                  arguments: remedios,
+                );
               },
             ),
           ],
         ),
       ),
-//layout
+
       body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            width: 430,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 8),
+              ],
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.medication, size: 85, color: Colors.teal),
 
-        child: Container(
+                const SizedBox(height: 10),
 
-          width: 430,
-          padding: EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius:
-              BorderRadius.circular(20),
-            boxShadow: [BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              ),
-            ],
-          ),
-
-          child: Column(
-
-            mainAxisSize: MainAxisSize.min,
-
-            children: [Icon(Icons.medication,
-
-                size: 85,
-                color:Color.fromARGB(255, 0, 110, 100),
-              ),
-
-              SizedBox(height: 10),
-
-              Text('MedLife',
-
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight:FontWeight.bold,
+                const Text(
+                  "MedLife",
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
-              ),
 
-              SizedBox(height: 22),
-//input
-              TextField(controller: nomeController,
+                const SizedBox(height: 15),
 
-                decoration:InputDecoration(
-                  border:OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-
-                  labelText:'Nome do Remédio',
-                ),
-              ),
-
-              SizedBox(height: 14),
-//input
-              TextField(controller : quantidadeController,
-
-                decoration:InputDecoration(
-                  border:OutlineInputBorder(
-                    borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  labelText:'Quantidade',
-                ),
-              ),
-
-              SizedBox(height: 14),
-//input
-              TextField(
-
-                controller:horarioController,
-
-                decoration:InputDecoration(
-
-                border:OutlineInputBorder(
-                  borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  labelText:'Horário (00:00)',
-                ),
-              ),
-
-              SizedBox(height: 14),
-//input
-              TextField(
-
-                controller:motivoController,
-
-                decoration:InputDecoration(
-                  border:OutlineInputBorder(
-                    borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  labelText:'Motivo do uso',
-                ),
-              ),
-//layout
-              SizedBox(height: 18),
-
-              Text('Dias da Semana',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight:FontWeight.bold,
-                ),
-              ),
-//layout
-              Wrap(spacing: 8,
-
-                children: List.generate( diasSemana.length,(index) {
-
-                    return Column(
-
-                      children: [
-
-                        Text(diasSemana[index]),
-
-                        Checkbox(value:diasSelecionados[index],
-
-                          onChanged:(value) {setState(() {
-                              diasSelecionados[index] = value!;
-                            });
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-//layout
-              SizedBox(height: 20),
-
-              SizedBox(
-
-                width: double.infinity,
-
-                child: ElevatedButton(
-
-                  style:ElevatedButton.styleFrom(
-                    backgroundColor:Colors.black,
-                  ),
-
-                  onPressed:salvarRemedio,
-
-                  child: Text('Salvar Remédio',
-
-                    style: TextStyle(
-                        color: Colors.white),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 800),
+                  child: Text(
+                    frases[fraseAtual],
+                    key: ValueKey(frases[fraseAtual]),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.teal,
+                    ),
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 25),
+
+                TextField(
+                  controller: nomeController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: 'Nome do Remédio',
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                TextField(
+                  controller: quantidadeController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: 'Quantidade',
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                TextField(
+                  controller: horarioController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: 'Horário (00:00)',
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                TextField(
+                  controller: motivoController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    labelText: 'Motivo do uso',
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                const Text(
+                  'Dias da Semana',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+
+                Wrap(
+                  spacing: 8,
+                  children: List.generate(
+                    diasSemana.length,
+                    (index) {
+                      return Column(
+                        children: [
+                          Text(diasSemana[index]),
+                          Checkbox(
+                            value: diasSelecionados[index],
+                            onChanged: (value) {
+                              setState(() {
+                                diasSelecionados[index] = value!;
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                AnimatedScale(
+                  scale: aumentarBotao ? 1.08 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                      onPressed: salvarRemedio,
+                      child: const Text(
+                        "Salvar Remédio",
+                        style: TextStyle(color: Colors.white, fontSize: 17),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 0, 90, 110),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/estatisticas',
+                        arguments: remedios,
+                      );
+                    },
+                    icon: const Icon(Icons.analytics, color: Colors.white),
+                    label: const Text(
+                      "Ver Estatísticas",
+                      style: TextStyle(color: Colors.white, fontSize: 17),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

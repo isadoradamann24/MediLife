@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../main.dart';
 
 class RegistroScreen extends StatelessWidget {
-
   RegistroScreen({super.key});
 
   final TextEditingController nomeController = TextEditingController();
@@ -12,125 +10,49 @@ class RegistroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:
-          Color.fromARGB(255, 235, 245, 245),
-
-      body: Center(child: Container(
-
+      backgroundColor: const Color.fromARGB(255, 235, 245, 245),
+      body: Center(
+        child: Container(
           width: 420,
-          padding: EdgeInsets.all(35),
+          padding: const EdgeInsets.all(30),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius:BorderRadius.circular(25),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 12,
-              ),
-            ],
+            borderRadius: BorderRadius.circular(20),
           ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.medication, size: 80),
 
-          child: Column(mainAxisSize: MainAxisSize.min,
+              const SizedBox(height: 20),
 
-            children: [Icon(Icons.medication,
-
-                size: 100,
-                color:Color.fromARGB(255, 0, 100, 120),
+              TextField(
+                controller: nomeController,
+                decoration: const InputDecoration(hintText: "Nome"),
               ),
 
-              SizedBox(height: 15),
-
-              Text('Criar Conta',
-
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight:FontWeight.bold,
-                  color:Color.fromARGB(255, 0, 90, 110),
-                ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(hintText: "Email"),
               ),
 
-              SizedBox(height: 35),
-//input
-              TextField(controller: nomeController,
-
-                decoration: InputDecoration(
-
-                  border:OutlineInputBorder(
-                    borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  hintText:'Digite seu nome',
-                ),
-              ),
-
-              SizedBox(height: 20),
-//navegação
-              TextField(controller : emailController,
-
-                decoration: InputDecoration(
-                  border:OutlineInputBorder(
-                    borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  hintText:'Digite seu email',
-                ),
-              ),
-
-              SizedBox(height: 20),
-//navegação
-              TextField(controller:senhaController,
-
+              TextField(
+                controller: senhaController,
                 obscureText: true,
-
-                decoration: InputDecoration(
-
-                  border:OutlineInputBorder(
-
-                    borderRadius:BorderRadius.circular(15),
-                  ),
-
-                  hintText:'Digite sua senha',
-                ),
+                decoration: const InputDecoration(hintText: "Senha"),
               ),
 
-              SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-              SizedBox(
+              ElevatedButton(
+                onPressed: () {
+                  emailCadastrado = emailController.text;
+                  senhaCadastrada = senhaController.text;
 
-                width: double.infinity,
-//input
-                child: ElevatedButton(
-
-                  style:ElevatedButton.styleFrom(
-
-                    backgroundColor:Colors.black,
-                    padding:EdgeInsets.all(16),
-                    shape:RoundedRectangleBorder(
-                      borderRadius:BorderRadius.circular(15),
-                    ),
-                  ),
-
-//navegação
-                  onPressed: () {
-
-                    emailCadastrado = emailController.text;
-
-                    senhaCadastrada = senhaController.text;
-
-                    Navigator.pushNamed(context,'/login');
-                  },
-
-                  child: Text('Cadastrar',
-
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                  Navigator.pushNamed(context, '/login');
+                },
+                child: const Text("Cadastrar"),
               ),
             ],
           ),
