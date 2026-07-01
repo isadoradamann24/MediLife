@@ -48,7 +48,6 @@ class _InicioScreenState extends State<InicioScreen> {
   }
 
   void salvarRemedio() async {
-    // 🔴 validação campos
     if (nomeController.text.isEmpty ||
         quantidadeController.text.isEmpty ||
         horarioController.text.isEmpty ||
@@ -59,7 +58,6 @@ class _InicioScreenState extends State<InicioScreen> {
       return;
     }
 
-    // 🔴 validação dias
     if (!diasSelecionados.contains(true)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Selecione pelo menos um dia")),
@@ -90,7 +88,6 @@ class _InicioScreenState extends State<InicioScreen> {
       remedios.add(remedio);
     });
 
-    // limpar campos
     nomeController.clear();
     quantidadeController.clear();
     horarioController.clear();
@@ -151,6 +148,17 @@ class _InicioScreenState extends State<InicioScreen> {
                   '/estatisticas',
                   arguments: remedios,
                 );
+              },
+            ),
+
+            const Divider(),
+
+            // 💊 NOVO ITEM - CALCULADORA
+            ListTile(
+              leading: const Icon(Icons.calculate, color: Color.fromARGB(255, 41, 40, 40)),
+              title: const Text("Calculadora de Dosagem"),
+              onTap: () {
+                Navigator.pushNamed(context, '/calculadora');
               },
             ),
           ],
@@ -300,7 +308,8 @@ class _InicioScreenState extends State<InicioScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 90, 110),
+                      backgroundColor:
+                          const Color.fromARGB(255, 0, 90, 110),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                     onPressed: () {

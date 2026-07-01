@@ -5,6 +5,9 @@ import 'screens/registro_screen.dart';
 import 'screens/inicio_screen.dart';
 import 'screens/detalhes_screen.dart';
 import 'screens/estatisticas_screen.dart';
+import 'screens/cadastro_screen.dart';
+import 'screens/calculadora_screen.dart';
+
 
 String emailCadastrado = '';
 String senhaCadastrada = '';
@@ -30,6 +33,10 @@ class MedLifeApp extends StatelessWidget {
         '/': (context) => InicioScreen(),
         '/detalhes': (context) => DetalhesScreen(),
         '/estatisticas': (context) => EstatisticasScreen(),
+        '/cadastro': (context) => CadastroRemedioScreen(),
+        '/calculadora': (context) => CalculadoraScreen(),
+
+
       },
     );
   }
