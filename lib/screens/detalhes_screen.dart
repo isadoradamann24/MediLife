@@ -121,8 +121,9 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
                 onChanged: alternarTomado,
               ),
 
-              // 🔥 FRASE NO MESMO ESTILO DO INÍCIO
               const SizedBox(height: 40),
+
+//animação - AnimatedSwitcher
 
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 700),
@@ -140,7 +141,7 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
                     : const SizedBox.shrink(),
               ),
 
-              const SizedBox(height: 60), // 👈 MAIS PARA BAIXO
+              const SizedBox(height: 60), 
 
               ElevatedButton(
                 style: ElevatedButton.styleFrom(

@@ -34,6 +34,8 @@ class _InicioScreenState extends State<InicioScreen> {
   void initState() {
     super.initState();
 
+//animação
+
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 4));
 
@@ -153,7 +155,6 @@ class _InicioScreenState extends State<InicioScreen> {
 
             const Divider(),
 
-            // 💊 NOVO ITEM - CALCULADORA
             ListTile(
               leading: const Icon(Icons.calculate, color: Color.fromARGB(255, 41, 40, 40)),
               title: const Text("Calculadora de Dosagem"),
@@ -190,6 +191,7 @@ class _InicioScreenState extends State<InicioScreen> {
 
                 const SizedBox(height: 15),
 
+//animação
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 800),
                   child: Text(
@@ -283,6 +285,8 @@ class _InicioScreenState extends State<InicioScreen> {
 
                 const SizedBox(height: 25),
 
+//animação
+
                 AnimatedScale(
                   scale: aumentarBotao ? 1.08 : 1.0,
                   duration: const Duration(milliseconds: 200),
@@ -294,8 +298,7 @@ class _InicioScreenState extends State<InicioScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: salvarRemedio,
-                      child: const Text(
-                        "Salvar Remédio",
+                      child: const Text("Salvar Remédio",
                         style: TextStyle(color: Colors.white, fontSize: 17),
                       ),
                     ),
@@ -320,8 +323,7 @@ class _InicioScreenState extends State<InicioScreen> {
                       );
                     },
                     icon: const Icon(Icons.analytics, color: Colors.white),
-                    label: const Text(
-                      "Ver Estatísticas",
+                    label: const Text("Ver Estatísticas",
                       style: TextStyle(color: Colors.white, fontSize: 17),
                     ),
                   ),

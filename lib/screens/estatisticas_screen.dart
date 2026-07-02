@@ -10,6 +10,8 @@ class EstatisticasScreen extends StatefulWidget {
 class _EstatisticasScreenState extends State<EstatisticasScreen>
     with SingleTickerProviderStateMixin {
 
+//animação
+
   late AnimationController _controller;
   late Animation<double> _fade;
   late Animation<double> _scale;
@@ -48,11 +50,12 @@ class _EstatisticasScreenState extends State<EstatisticasScreen>
     final List<Map<String, dynamic>> dados =
         args is List ? List<Map<String, dynamic>>.from(args) : [];
 
-    // ===================== CÁLCULOS =====================
     int total = dados.length;
     int diasTotal = 0;
     String maisUsado = "-";
     int maiorUso = 0;
+
+//calculo
 
     for (var r in dados) {
       int cont = 0;
@@ -75,7 +78,6 @@ class _EstatisticasScreenState extends State<EstatisticasScreen>
     double aproveitamento =
         total == 0 ? 0 : (diasTotal / (total * 7)) * 100;
 
-    // ===================== UI =====================
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 235, 245, 245),
 
@@ -150,7 +152,6 @@ class _EstatisticasScreenState extends State<EstatisticasScreen>
     );
   }
 
-  // ===================== CARD REUTILIZÁVEL =====================
   Widget _card(String titulo, String valor) {
     return Container(
       width: double.infinity,
