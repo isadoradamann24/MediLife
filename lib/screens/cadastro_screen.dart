@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/remedio.dart';
+import '../database/database.dart';
 
 class CadastroRemedioScreen extends StatefulWidget {
   const CadastroRemedioScreen({super.key});
@@ -10,137 +12,339 @@ class CadastroRemedioScreen extends StatefulWidget {
 
 class _CadastroRemedioScreenState
     extends State<CadastroRemedioScreen> {
+  final TextEditingController nomeController =
+      TextEditingController();
 
-  final TextEditingController nomeController = TextEditingController();
-  final TextEditingController dosagemController = TextEditingController();
-  final TextEditingController quantidadeController = TextEditingController();
-  final TextEditingController horarioController = TextEditingController();
+  final TextEditingController quantidadeController =
+      TextEditingController();
 
-  List<Map<String, dynamic>> remedios = [];
+  final TextEditingController horarioController =
+      TextEditingController();
 
-  void salvarRemedio() {
+  final TextEditingController motivoController =
+      TextEditingController();
 
-    if (nomeController.text.isEmpty ||
-        dosagemController.text.isEmpty ||
-        quantidadeController.text.isEmpty ||
-        horarioController.text.isEmpty) {
+  final List<String> diasSemana = [
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado",
+    "Domingo",
+  ];
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Preencha todos os campos."),
-        ),
+  final Set<String> diasSelecionados = {};
+
+  bool tomou = false;
+
+  bool salvando = false;
+
+  @override
+  void dispose() {
+    nomeController.dispose();
+    quantidadeController.dispose();
+    horarioController.dispose();
+    motivoController.dispose();
+
+    super.dispose();
+  }
+
+  // ----------------------------------------------------------
+  // SELECIONAR HORÁRIO
+  // ----------------------------------------------------------
+
+  Future<void> selecionarHorario() async {
+    final TimeOfDay? horarioSelecionado =
+        await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (horarioSelecionado != null) {
+      setState(() {
+        horarioController.text =
+            horarioSelecionado.format(context);
+      });
+    }
+  }
+
+  // ----------------------------------------------------------
+  // SALVAR REMÉDIO
+  // ----------------------------------------------------------
+
+  Future<void> salvarRemedio() async {
+    if (salvando) return;
+
+    // Verifica o nome
+    if (nomeController.text.trim().isEmpty) {
+      mostrarMensagem(
+        "Digite o nome do remédio.",
+      );
+      return;
+    }
+
+    // Verifica quantidade
+    if (quantidadeController.text.trim().isEmpty) {
+      mostrarMensagem(
+        "Digite a quantidade.",
+      );
+      return;
+    }
+
+    // Verifica horário
+    if (horarioController.text.trim().isEmpty) {
+      mostrarMensagem(
+        "Selecione o horário.",
+      );
+      return;
+    }
+
+    // Verifica os dias
+    if (diasSelecionados.isEmpty) {
+      mostrarMensagem(
+        "Selecione pelo menos um dia.",
+      );
+      return;
+    }
+
+    final int? quantidade =
+        int.tryParse(quantidadeController.text.trim());
+
+    if (quantidade == null || quantidade <= 0) {
+      mostrarMensagem(
+        "Digite uma quantidade válida.",
       );
       return;
     }
 
     setState(() {
-      remedios.add({
-        "nome": nomeController.text,
-        "dosagem": dosagemController.text,
-        "quantidade": quantidadeController.text,
-        "horario": horarioController.text,
-      });
+      salvando = true;
     });
 
+    try {
+      // Converte os dias selecionados para texto
+      final String dias =
+          diasSelecionados.join(", ");
+
+      // Cria o objeto Remedio
+      final Remedio remedio = Remedio(
+        nome: nomeController.text.trim(),
+        quantidade: quantidade,
+        horario: horarioController.text.trim(),
+        motivo: motivoController.text.trim(),
+        dias: dias,
+        tomou: tomou,
+      );
+
+      // Salva no SQLite
+      await DatabaseHelper.instance.inserirRemedio(
+        remedio.toMap(),
+      );
+
+      if (!mounted) return;
+
+      mostrarMensagem(
+        "Remédio cadastrado com sucesso!",
+      );
+
+      // Limpa os campos
+      limparFormulario();
+
+      // Volta para a tela anterior
+      Navigator.pop(context, true);
+    } catch (erro) {
+      if (!mounted) return;
+
+      mostrarMensagem(
+        "Erro ao salvar o remédio.",
+      );
+
+      debugPrint(
+        "Erro ao cadastrar remédio: $erro",
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          salvando = false;
+        });
+      }
+    }
+  }
+
+  // ----------------------------------------------------------
+  // LIMPAR FORMULÁRIO
+  // ----------------------------------------------------------
+
+  void limparFormulario() {
     nomeController.clear();
-    dosagemController.clear();
     quantidadeController.clear();
     horarioController.clear();
+    motivoController.clear();
 
+    setState(() {
+      diasSelecionados.clear();
+      tomou = false;
+    });
+  }
+
+  // ----------------------------------------------------------
+  // MENSAGEM
+  // ----------------------------------------------------------
+
+  void mostrarMensagem(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Remédio cadastrado com sucesso!"),
+      SnackBar(
+        content: Text(mensagem),
       ),
     );
   }
 
+  // ----------------------------------------------------------
+  // INTERFACE
+  // ----------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      backgroundColor: const Color.fromARGB(255, 235, 245, 245),
-
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 90, 110),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text("Cadastro de Remédios"),
+        title: const Text(
+          "Cadastrar Remédio",
+        ),
       ),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
 
         child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch,
 
           children: [
 
+            // ------------------------------------------------
+            // NOME
+            // ------------------------------------------------
+
             TextField(
               controller: nomeController,
-              decoration: const InputDecoration(
-                labelText: "Nome do remédio",
-                prefixIcon: Icon(Icons.medication),
+
+              decoration: InputDecoration(
+                labelText: "Nome do Remédio",
+                hintText: "Ex.: Dipirona",
+                prefixIcon: const Icon(
+                  Icons.medication,
+                ),
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12),
+                ),
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 18),
 
-            TextField(
-              controller: dosagemController,
-              decoration: const InputDecoration(
-                labelText: "Dosagem (Ex: 500 mg)",
-                prefixIcon: Icon(Icons.medical_services),
-              ),
-            ),
-
-            const SizedBox(height: 15),
+            // ------------------------------------------------
+            // QUANTIDADE
+            // ------------------------------------------------
 
             TextField(
               controller: quantidadeController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+
+              keyboardType:
+                  TextInputType.number,
+
+              decoration: InputDecoration(
                 labelText: "Quantidade",
-                prefixIcon: Icon(Icons.numbers),
+                hintText: "Ex.: 2",
+
+                prefixIcon: const Icon(
+                  Icons.numbers,
+                ),
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12),
+                ),
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 18),
+
+            // ------------------------------------------------
+            // HORÁRIO
+            // ------------------------------------------------
 
             TextField(
               controller: horarioController,
-              decoration: const InputDecoration(
-                labelText: "Horário (Ex: 08:00)",
-                prefixIcon: Icon(Icons.access_time),
+
+              readOnly: true,
+
+              onTap: selecionarHorario,
+
+              decoration: InputDecoration(
+                labelText: "Horário",
+
+                hintText: "00:00",
+
+                prefixIcon: const Icon(
+                  Icons.access_time,
+                ),
+
+                suffixIcon: const Icon(
+                  Icons.schedule,
+                ),
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12),
+                ),
               ),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 18),
 
-            SizedBox(
-              width: double.infinity,
+            // ------------------------------------------------
+            // MOTIVO
+            // ------------------------------------------------
 
-              child: ElevatedButton(
+            TextField(
+              controller: motivoController,
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  padding: const EdgeInsets.all(15),
-                ),
+              maxLines: 3,
 
-                onPressed: salvarRemedio,
+              decoration: InputDecoration(
+                labelText: "Motivo",
 
-                child: const Text(
-                  "Cadastrar Remédio",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
+                hintText:
+                    "Ex.: Dor de cabeça",
+
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.only(
+                    bottom: 45,
+                  ),
+                  child: Icon(
+                    Icons.notes,
                   ),
                 ),
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12),
+                ),
               ),
             ),
 
             const SizedBox(height: 25),
 
+            // ------------------------------------------------
+            // DIAS
+            // ------------------------------------------------
+
             const Text(
-              "Remédios cadastrados",
+              "Dias da semana",
+
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -149,37 +353,116 @@ class _CadastroRemedioScreenState
 
             const SizedBox(height: 10),
 
-            Expanded(
-              child: ListView.builder(
-                itemCount: remedios.length,
+            ...diasSemana.map(
+              (dia) {
+                return CheckboxListTile(
+                  title: Text(dia),
 
-                itemBuilder: (context, index) {
+                  value:
+                      diasSelecionados.contains(dia),
 
-                  final remedio = remedios[index];
+                  activeColor:
+                      Colors.teal,
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
+                  contentPadding:
+                      EdgeInsets.zero,
 
-                    child: ListTile(
+                  onChanged: (valor) {
+                    setState(() {
+                      if (valor == true) {
+                        diasSelecionados.add(
+                          dia,
+                        );
+                      } else {
+                        diasSelecionados.remove(
+                          dia,
+                        );
+                      }
+                    });
+                  },
+                );
+              },
+            ),
 
-                      leading: const Icon(
-                        Icons.medication,
-                        color: Color.fromARGB(255, 0, 90, 110),
+            const SizedBox(height: 10),
+
+            // ------------------------------------------------
+            // TOMOU
+            // ------------------------------------------------
+
+            SwitchListTile(
+              title: const Text(
+                "Já tomou este remédio?",
+              ),
+
+              value: tomou,
+
+              activeColor:
+                  Colors.teal,
+
+              contentPadding:
+                  EdgeInsets.zero,
+
+              onChanged: (valor) {
+                setState(() {
+                  tomou = valor;
+                });
+              },
+            ),
+
+            const SizedBox(height: 25),
+
+            // ------------------------------------------------
+            // BOTÃO SALVAR
+            // ------------------------------------------------
+
+            SizedBox(
+              height: 55,
+
+              child: ElevatedButton(
+                onPressed:
+                    salvando
+                        ? null
+                        : salvarRemedio,
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.black,
+
+                  foregroundColor:
+                      Colors.white,
+
+                  shape:
+                      RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(12),
+                  ),
+                ),
+
+                child: salvando
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+
+                        child:
+                            CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        "SALVAR REMÉDIO",
+
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
                       ),
-
-                      title: Text(remedio["nome"]),
-
-                      subtitle: Text(
-                        "Dosagem: ${remedio["dosagem"]}\n"
-                        "Quantidade: ${remedio["quantidade"]}\n"
-                        "Horário: ${remedio["horario"]}",
-                      ),
-
-                    ),
-                  );
-                },
               ),
             ),
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
