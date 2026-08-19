@@ -1,135 +1,288 @@
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
-class DatabaseHelper {
-  static const _databaseName = "medlife.db";
-  static const _databaseVersion = 1;
+import '../models/remedio.dart';
 
-  static const tableRemedios = "remedios";
 
-  static const columnId = "id";
-  static const columnNome = "nome";
-  static const columnQuantidade = "quantidade";
-  static const columnHorario = "horario";
-  static const columnMotivo = "motivo";
-  static const columnDias = "dias";
-  static const columnTomou = "tomou";
+class DatabaseHandler {
 
-  DatabaseHelper._privateConstructor();
 
-  static final DatabaseHelper instance =
-      DatabaseHelper._privateConstructor();
+  // ----------------------------------------------------------
+  // CRIAR / INICIALIZAR BANCO
+  // ----------------------------------------------------------
 
-  static Database? _database;
+  Future<Database> initializeDB() async {
 
-  Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    }
+    String path = await getDatabasesPath();
 
-    _database = await _initDatabase();
-    return _database!;
-  }
 
-  Future<Database> _initDatabase() async {
-    final directory = await getApplicationDocumentsDirectory();
+    return openDatabase(
 
-    final path = join(
-      directory.path,
-      _databaseName,
+      join(
+        path,
+        "medlife.db",
+      ),
+
+
+      onCreate: (database, version) async {
+
+
+        await database.execute(
+
+          '''
+          CREATE TABLE remedios(
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            nome TEXT NOT NULL,
+
+            quantidade INTEGER NOT NULL,
+
+            horario TEXT NOT NULL,
+
+            motivo TEXT,
+
+            dias TEXT NOT NULL,
+
+            tomou INTEGER NOT NULL
+
+          )
+          '''
+
+        );
+
+
+      },
+
+
+      version: 1,
+
+
     );
 
-    return await openDatabase(
-      path,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-    );
+
   }
 
-  Future<void> _onCreate(
-    Database db,
-    int version,
-  ) async {
-    await db.execute('''
-      CREATE TABLE $tableRemedios (
-        $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-        $columnNome TEXT NOT NULL,
-        $columnQuantidade INTEGER NOT NULL,
-        $columnHorario TEXT NOT NULL,
-        $columnMotivo TEXT,
-        $columnDias TEXT NOT NULL,
-        $columnTomou INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
-  }
 
+
+
+
+
+  // ----------------------------------------------------------
   // INSERIR REMÉDIO
+  // ----------------------------------------------------------
+
   Future<int> inserirRemedio(
-    Map<String, dynamic> remedio,
-  ) async {
-    final db = await database;
+      Remedio remedio
+      ) async {
 
-    return await db.insert(
-      tableRemedios,
-      remedio,
+
+    int resultado = 0;
+
+
+
+    final Database db =
+        await initializeDB();
+
+
+
+
+    resultado = await db.insert(
+
+      "remedios",
+
+      remedio.toMap(),
+
     );
+
+
+
+    return resultado;
+
+
   }
 
+
+
+
+
+
+
+
+  // ----------------------------------------------------------
   // BUSCAR TODOS OS REMÉDIOS
-  Future<List<Map<String, dynamic>>> buscarRemedios() async {
-    final db = await database;
+  // ----------------------------------------------------------
 
-    return await db.query(
-      tableRemedios,
-      orderBy: "$columnId DESC",
-    );
+  Future<List<Remedio>> buscarRemedios() async {
+
+
+    final Database db =
+        await initializeDB();
+
+
+
+
+    final List<Map<String, Object?>> resultado =
+
+        await db.query(
+
+          "remedios",
+
+          orderBy: "id DESC",
+
+        );
+
+
+
+
+    return resultado
+
+        .map(
+
+          (e) => Remedio.fromMap(e),
+
+        )
+
+        .toList();
+
+
   }
 
+
+
+
+
+
+
+
+
+  // ----------------------------------------------------------
   // BUSCAR UM REMÉDIO PELO ID
-  Future<Map<String, dynamic>?> buscarRemedioPorId(
-    int id,
-  ) async {
-    final db = await database;
+  // ----------------------------------------------------------
+
+  Future<Remedio?> buscarRemedioPorId(
+      int id
+      ) async {
+
+
+    final Database db =
+        await initializeDB();
+
+
+
 
     final resultado = await db.query(
-      tableRemedios,
-      where: "$columnId = ?",
-      whereArgs: [id],
+
+      "remedios",
+
+      where: "id = ?",
+
+      whereArgs: [
+
+        id
+
+      ],
+
     );
 
-    if (resultado.isNotEmpty) {
-      return resultado.first;
+
+
+
+    if(resultado.isNotEmpty){
+
+
+      return Remedio.fromMap(
+
+        resultado.first,
+
+      );
+
+
     }
 
+
+
     return null;
+
+
   }
 
+  // ----------------------------------------------------------
   // ATUALIZAR REMÉDIO
+  // ----------------------------------------------------------
+
   Future<int> atualizarRemedio(
-    int id,
-    Map<String, dynamic> remedio,
-  ) async {
-    final db = await database;
+
+      int id,
+
+      Map<String, Object?> remedio,
+
+      ) async {
+
+
+    final Database db =
+        await initializeDB();
+
+
+
 
     return await db.update(
-      tableRemedios,
+
+      "remedios",
+
       remedio,
-      where: "$columnId = ?",
-      whereArgs: [id],
-    );
-  }
 
+      where: "id = ?",
+
+
+      whereArgs: [
+
+        id
+
+      ],
+
+
+    );
+
+
+  }
+  // ----------------------------------------------------------
   // EXCLUIR REMÉDIO
-  Future<int> excluirRemedio(
-    int id,
-  ) async {
-    final db = await database;
+  // ----------------------------------------------------------
 
-    return await db.delete(
-      tableRemedios,
-      where: "$columnId = ?",
-      whereArgs: [id],
+  Future<void> excluirRemedio(
+
+      int id
+
+      ) async {
+
+
+
+    final Database db =
+        await initializeDB();
+
+
+
+
+    await db.delete(
+
+      "remedios",
+
+      where: "id = ?",
+
+
+      whereArgs: [
+
+        id
+
+      ],
+
+
     );
+
+
   }
+
+
+
 }

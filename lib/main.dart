@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/login_screen.dart';
+import 'screens/login_screen.dart';  
 import 'screens/inicio_screen.dart';
 import 'screens/detalhes_screen.dart';
 import 'screens/estatisticas_screen.dart';
@@ -31,7 +31,7 @@ class MedLifeApp extends StatelessWidget {
         '/': (context) => InicioScreen(),
         '/detalhes': (context) => DetalhesScreen(),
         '/estatisticas': (context) => EstatisticasScreen(),
-        '/cadastro': (context) => CadastroRemedioScreen(),
+        '/cadastro': (context) => CadastroScreen(),
         '/calculadora': (context) => CalculadoraScreen(),
         
       },

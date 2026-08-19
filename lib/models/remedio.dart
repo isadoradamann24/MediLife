@@ -5,7 +5,7 @@ class Remedio {
   final String horario;
   final String motivo;
   final String dias;
-  final bool tomou;
+  final int tomou;
 
   Remedio({
     this.id,
@@ -17,6 +17,8 @@ class Remedio {
     required this.tomou,
   });
 
+
+  // Pega os dados do banco e transforma em objeto Remedio
   Remedio.fromMap(Map<String, dynamic> res)
       : id = res["id"],
         nome = res["nome"],
@@ -24,8 +26,10 @@ class Remedio {
         horario = res["horario"],
         motivo = res["motivo"],
         dias = res["dias"],
-        tomou = res["tomou"] == 1;
+        tomou = res["tomou"];
 
+
+  // Transforma o objeto Remedio em dados para salvar no banco
   Map<String, Object?> toMap() {
     return {
       "id": id,
@@ -34,7 +38,7 @@ class Remedio {
       "horario": horario,
       "motivo": motivo,
       "dias": dias,
-      "tomou": tomou ? 1 : 0,
+      "tomou": tomou,
     };
   }
 }
