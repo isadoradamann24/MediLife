@@ -1,39 +1,37 @@
 import 'package:flutter/material.dart';
 
-import 'screens/login_screen.dart';  
+import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/inicio_screen.dart';
 import 'screens/detalhes_screen.dart';
 import 'screens/estatisticas_screen.dart';
 import 'screens/cadastro_screen.dart';
 import 'screens/calculadora_screen.dart';
 
-
 String emailCadastrado = '';
 String senhaCadastrada = '';
 
 void main() {
-  runApp(const MedLifeApp());
+  runApp(const MediLifeApp());
 }
 
-class MedLifeApp extends StatelessWidget {
-  const MedLifeApp({super.key});
+class MediLifeApp extends StatelessWidget {
+  const MediLifeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MedLife',
-
-      initialRoute: '/login',
-
+      initialRoute: '/splash',
       routes: {
+        '/splash': (context) => const SplashScreen(),
         '/login': (context) => LoginScreen(),
         '/': (context) => InicioScreen(),
         '/detalhes': (context) => DetalhesScreen(),
         '/estatisticas': (context) => EstatisticasScreen(),
         '/cadastro': (context) => CadastroScreen(),
         '/calculadora': (context) => CalculadoraScreen(),
-        
       },
     );
   }

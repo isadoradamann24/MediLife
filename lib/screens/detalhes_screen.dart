@@ -21,61 +21,19 @@ class _DetalhesScreenState
     extends State<DetalhesScreen> {
 
 
-  Remedio? remedio;
-
-  bool tomou = false;
+  List<Remedio> remedios = [];
 
   bool carregando = true;
 
 
 
-  final List<String> frases = [
-
-    "💚 Ótimo! Você cuidou da sua saúde hoje.",
-
-    "💊 Excelente! Remédio tomado com sucesso.",
-
-    "✨ Mais um dia de cuidado com você mesmo.",
-
-    "❤️ Parabéns! Sua saúde em primeiro lugar.",
-
-  ];
-
-
-
-  int fraseAtual = 0;
-
-
-
 
   @override
-  void didChangeDependencies() {
+  void initState() {
 
-    super.didChangeDependencies();
+    super.initState();
 
-
-    if (remedio != null) {
-      return;
-    }
-
-
-    final argumento =
-        ModalRoute.of(context)?.settings.arguments;
-
-
-
-    if (argumento is Remedio) {
-
-
-      remedio = argumento;
-
-
-      tomou = argumento.tomou == 1;
-
-
-      carregando = false;
-
-    }
+    carregarRemedios();
 
   }
 
@@ -83,18 +41,7 @@ class _DetalhesScreenState
 
 
 
-
-
-  Future<void> alternarTomado(bool valor) async {
-
-
-    if (remedio == null ||
-        remedio!.id == null) {
-
-      return;
-
-    }
-
+  Future<void> carregarRemedios() async {
 
 
     try {
@@ -105,74 +52,38 @@ class _DetalhesScreenState
 
 
 
-      await handler.atualizarRemedio(
-
-        remedio!.id!,
-
-        {
-
-          "tomou": valor ? 1 : 0,
-
-        },
-
-      );
+      final resultado =
+          await handler.retrieveRemedios();
 
 
 
-
-      if (!mounted) return;
+      if(!mounted) return;
 
 
 
       setState(() {
 
+        remedios = resultado;
 
-        tomou = valor;
-
-
-
-        if (valor) {
-
-
-          fraseAtual =
-
-              (fraseAtual + 1) %
-
-              frases.length;
-
-
-        }
-
+        carregando = false;
 
       });
 
 
 
-    } catch (erro) {
+    } catch(e){
 
 
       debugPrint(
-        "Erro ao atualizar status: $erro",
+        "Erro ao carregar remédios: $e",
       );
 
 
+      setState(() {
 
-      if (!mounted) return;
+        carregando = false;
 
-
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            "Não foi possível atualizar o status.",
-          ),
-
-        ),
-
-      );
+      });
 
 
     }
@@ -186,28 +97,20 @@ class _DetalhesScreenState
 
 
 
-  bool diaSelecionado(
-      String dias,
-      String dia,
-      ) {
+  Future<void> excluirRemedio(int id) async {
 
 
-    final lista = dias
-
-        .split(",")
-
-        .map(
-          (item) =>
-              item.trim().toLowerCase(),
-        )
-
-        .toList();
+    DatabaseHandler handler =
+        DatabaseHandler();
 
 
 
-    return lista.contains(
-      dia.toLowerCase(),
-    );
+    await handler.deleteRemedio(id);
+
+
+
+    carregarRemedios();
+
 
   }
 
@@ -222,46 +125,18 @@ class _DetalhesScreenState
   Widget build(BuildContext context) {
 
 
-
-    if (carregando || remedio == null) {
-
-
-      return const Scaffold(
-
-        body: Center(
-
-          child:
-              CircularProgressIndicator(),
-
-        ),
-
-      );
-
-    }
-
-
-
-    final remedioAtual = remedio!;
-
-
-
-
     return Scaffold(
 
 
 
-      backgroundColor:
-          const Color.fromARGB(
-            255,
-            235,
-            245,
-            245,
-          ),
-
-
-
-
       appBar: AppBar(
+
+
+        title:
+            const Text(
+              "Meus Remédios",
+            ),
+
 
         backgroundColor:
             const Color.fromARGB(
@@ -272,403 +147,73 @@ class _DetalhesScreenState
             ),
 
 
-        title:
-            const Text(
-              "Detalhes do Remédio",
-            ),
-
       ),
 
 
 
 
 
-      body: Center(
+      body:
 
 
-        child: SingleChildScrollView(
+      carregando
 
 
-          padding:
-              const EdgeInsets.all(25),
+      ? const Center(
+
+          child:
+              CircularProgressIndicator(),
+
+        )
 
 
 
-          child: Column(
+      : remedios.isEmpty
 
+
+
+      ? const Center(
+
+          child:
+              Column(
+
+            mainAxisAlignment:
+                MainAxisAlignment.center,
 
 
             children: [
 
 
+              Icon(
 
-              const Icon(
+                Icons.medication_outlined,
 
-                Icons.medication,
+                size: 80,
 
-                size: 100,
+                color: Colors.grey,
 
               ),
 
 
 
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: 15,
               ),
-
 
 
 
               Text(
 
-
-                remedioAtual.nome,
-
-
-                textAlign:
-                    TextAlign.center,
-
-
-                style:
-                    const TextStyle(
-
-                  fontSize: 28,
-
-                  fontWeight:
-                      FontWeight.bold,
-
-                ),
-
-
-              ),
-
-
-
-
-              const SizedBox(
-                height: 25,
-              ),
-
-
-
-
-
-              Text(
-                "Quantidade: ${remedioAtual.quantidade}",
-              ),
-
-
-
-
-              const SizedBox(
-                height: 8,
-              ),
-
-
-
-
-              Text(
-                "Horário: ${remedioAtual.horario}",
-              ),
-
-
-
-
-              const SizedBox(
-                height: 8,
-              ),
-
-
-
-
-
-              Text(
-
-                "Motivo: ${remedioAtual.motivo.isEmpty ? "Não informado" : remedioAtual.motivo}",
-
-
-                textAlign:
-                    TextAlign.center,
-
-              ),
-
-
-
-
-
-              const SizedBox(
-                height: 25,
-              ),
-
-
-
-
-
-              const Text(
-
-                "Dias de uso",
+                "Nenhum remédio cadastrado.",
 
                 style:
                     TextStyle(
 
                   fontSize: 18,
 
-                  fontWeight:
-                      FontWeight.bold,
-
                 ),
 
               ),
-
-
-
-
-
-              const SizedBox(
-                height: 12,
-              ),
-
-
-
-
-
-              construirDia(
-                "Seg",
-                "Segunda",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Ter",
-                "Terça",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Qua",
-                "Quarta",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Qui",
-                "Quinta",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Sex",
-                "Sexta",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Sáb",
-                "Sábado",
-                remedioAtual.dias,
-              ),
-
-
-              construirDia(
-                "Dom",
-                "Domingo",
-                remedioAtual.dias,
-              ),
-
-
-
-
-
-
-              const SizedBox(
-                height: 25,
-              ),
-
-
-
-
-
-              SwitchListTile(
-
-
-                title:
-                    const Text(
-                      "Remédio tomado?",
-                    ),
-
-
-
-                value:
-                    tomou,
-
-
-
-                activeColor:
-                    Colors.green,
-
-
-
-                onChanged:
-                    alternarTomado,
-
-              ),
-
-
-
-
-
-
-              const SizedBox(
-                height: 40,
-              ),
-
-
-
-
-
-
-              AnimatedSwitcher(
-
-
-
-                duration:
-                    const Duration(
-                      milliseconds: 700,
-                    ),
-
-
-
-
-                transitionBuilder:
-                    (child, animation) {
-
-
-                  return FadeTransition(
-
-                    opacity:
-                        animation,
-
-
-                    child:
-                        ScaleTransition(
-
-                      scale:
-                          animation,
-
-                      child:
-                          child,
-
-                    ),
-
-                  );
-
-
-                },
-
-
-
-
-                child:
-                    tomou
-
-                    ? Text(
-
-
-                        frases[fraseAtual],
-
-
-                        key:
-                            ValueKey(
-                              frases[fraseAtual],
-                            ),
-
-
-
-                        textAlign:
-                            TextAlign.center,
-
-
-
-                        style:
-                            const TextStyle(
-
-                          fontSize: 16,
-
-                          fontStyle:
-                              FontStyle.italic,
-
-                          color:
-                              Colors.teal,
-
-                        ),
-
-
-                      )
-
-                    : const SizedBox.shrink(),
-
-
-
-              ),
-
-
-
-
-
-
-              const SizedBox(
-                height: 60,
-              ),
-
-
-
-
-
-
-              ElevatedButton(
-
-
-
-                style:
-                    ElevatedButton.styleFrom(
-
-                  backgroundColor:
-                      Colors.black,
-
-                  foregroundColor:
-                      Colors.white,
-
-                ),
-
-
-
-                onPressed: () {
-
-
-                  Navigator.pop(
-                    context,
-                    true,
-                  );
-
-
-                },
-
-
-
-                child:
-                    const Text(
-                      "Voltar",
-                    ),
-
-
-              ),
-
-
 
 
             ],
@@ -677,106 +222,337 @@ class _DetalhesScreenState
           ),
 
 
-        ),
-
-
-      ),
-
-
-    );
-
-
-  }
+        )
 
 
 
 
+      : RefreshIndicator(
 
 
+          onRefresh:
+              carregarRemedios,
 
-
-
-  Widget construirDia(
-
-      String abreviacao,
-
-      String diaCompleto,
-
-      String dias,
-
-      ) {
-
-
-
-    final selecionado =
-        diaSelecionado(
-          dias,
-          diaCompleto,
-        );
-
-
-
-
-    return Row(
-
-
-      mainAxisAlignment:
-          MainAxisAlignment.center,
-
-
-
-      children: [
-
-
-
-        Icon(
-
-
-          selecionado
-
-              ? Icons.check_circle
-
-              : Icons.cancel,
-
-
-
-          color:
-
-          selecionado
-
-              ? Colors.green
-
-              : Colors.red,
-
-
-        ),
-
-
-
-
-        const SizedBox(
-          width: 10,
-        ),
-
-
-
-
-
-        SizedBox(
-
-          width: 45,
 
 
           child:
-              Text(
-                abreviacao,
-              ),
+              ListView.builder(
+
+
+            padding:
+                const EdgeInsets.all(16),
+
+
+
+            itemCount:
+                remedios.length,
+
+
+
+            itemBuilder:
+                (context,index){
+
+
+
+              final remedio =
+                  remedios[index];
+
+
+
+
+
+              return Card(
+
+
+                elevation:
+                    5,
+
+
+                margin:
+                    const EdgeInsets.only(
+                      bottom: 15,
+                    ),
+
+
+
+                shape:
+                    RoundedRectangleBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(15),
+
+                ),
+
+
+
+
+
+                child:
+                    ListTile(
+
+
+
+                  leading:
+                      CircleAvatar(
+
+
+                    backgroundColor:
+                        Colors.teal,
+
+
+                    child:
+                        const Icon(
+
+                      Icons.medication,
+
+                      color:
+                          Colors.white,
+
+                    ),
+
+
+                  ),
+
+
+
+
+
+                  title:
+                      Text(
+
+
+                    remedio.nome,
+
+
+                    style:
+                        const TextStyle(
+
+                      fontWeight:
+                          FontWeight.bold,
+
+                      fontSize:
+                          18,
+
+                    ),
+
+
+                  ),
+
+
+
+
+
+
+                  subtitle:
+                      Column(
+
+
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
+
+                    children: [
+
+
+
+                      const SizedBox(
+                        height: 5,
+                      ),
+
+
+
+
+                      Text(
+
+                        "Quantidade: ${remedio.quantidade}",
+
+                      ),
+
+
+
+
+                      Text(
+
+                        "Horário: ${remedio.horario}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        remedio.tomou == 1
+
+                        ? "Status: Tomado ✅"
+
+                        : "Status: Pendente ⏰",
+
+                      ),
+
+
+
+
+                    ],
+
+
+                  ),
+
+
+
+
+
+
+                  trailing:
+                      PopupMenuButton(
+
+
+
+                    itemBuilder:
+                        (context)=>[
+
+
+
+                      const PopupMenuItem(
+
+                        value:
+                            "detalhes",
+
+                        child:
+                            Text(
+                              "Detalhes",
+                            ),
+
+                      ),
+
+
+
+
+                      const PopupMenuItem(
+
+                        value:
+                            "excluir",
+
+                        child:
+                            Text(
+                              "Excluir",
+                            ),
+
+                      ),
+
+
+
+                    ],
+
+
+
+
+                    onSelected:
+                        (valor){
+
+
+
+                      if(valor == "detalhes"){
+
+
+
+                        Navigator.pushNamed(
+
+                          context,
+
+                          "/detalhes",
+
+                          arguments:
+                              remedio,
+
+                        );
+
+
+
+                      }
+
+
+
+
+                      if(valor == "excluir"){
+
+
+
+                        if(remedio.id != null){
+
+
+                          excluirRemedio(
+                            remedio.id!,
+                          );
+
+
+                        }
+
+
+                      }
+
+
+
+                    },
+
+
+                  ),
+
+
+
+
+                  onTap: () async {
+
+
+
+                    final resultado =
+                        await Navigator.pushNamed(
+
+
+                      context,
+
+                      "/detalhes",
+
+                      arguments:
+                          remedio,
+
+
+                    );
+
+
+
+
+                    if(resultado == true){
+
+
+                      carregarRemedios();
+
+
+                    }
+
+
+
+                  },
+
+
+
+                ),
+
+
+              );
+
+
+
+            },
+
+
+          ),
+
 
         ),
 
 
-
-      ],
 
 
     );

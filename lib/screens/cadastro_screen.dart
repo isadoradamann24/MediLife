@@ -5,12 +5,16 @@ import '../database/database.dart';
 
 
 class CadastroScreen extends StatefulWidget {
+
   const CadastroScreen({super.key});
+
 
   @override
   State<CadastroScreen> createState() =>
       _CadastroScreenState();
+
 }
+
 
 
 class _CadastroScreenState
@@ -20,14 +24,18 @@ class _CadastroScreenState
   final TextEditingController nomeController =
       TextEditingController();
 
+
   final TextEditingController quantidadeController =
       TextEditingController();
+
 
   final TextEditingController horarioController =
       TextEditingController();
 
+
   final TextEditingController motivoController =
       TextEditingController();
+
 
 
   final List<String> diasSemana = [
@@ -43,7 +51,9 @@ class _CadastroScreenState
   ];
 
 
+
   final Set<String> diasSelecionados = {};
+
 
 
   bool tomou = false;
@@ -52,13 +62,18 @@ class _CadastroScreenState
 
 
 
+
   @override
   void dispose() {
 
     nomeController.dispose();
+
     quantidadeController.dispose();
+
     horarioController.dispose();
+
     motivoController.dispose();
+
 
     super.dispose();
 
@@ -66,31 +81,35 @@ class _CadastroScreenState
 
 
 
-  // SELECIONAR HORÁRIO
+
+
 
   Future<void> selecionarHorario() async {
 
 
-    final TimeOfDay? horarioSelecionado =
+    final TimeOfDay? horario =
         await showTimePicker(
 
-      context: context,
+          context: context,
 
-      initialTime: TimeOfDay.now(),
+          initialTime:
+              TimeOfDay.now(),
 
-    );
+        );
 
 
-    if (horarioSelecionado != null) {
+
+    if(horario != null){
 
       setState(() {
 
         horarioController.text =
-            horarioSelecionado.format(context);
+            horario.format(context);
 
       });
 
     }
+
 
   }
 
@@ -98,16 +117,16 @@ class _CadastroScreenState
 
 
 
-  // SALVAR REMÉDIO
+
 
   Future<void> salvarRemedio() async {
 
 
-    if (salvando) return;
+    if(salvando) return;
 
 
 
-    if (nomeController.text.trim().isEmpty) {
+    if(nomeController.text.trim().isEmpty){
 
       mostrarMensagem(
         "Digite o nome do remédio.",
@@ -119,7 +138,7 @@ class _CadastroScreenState
 
 
 
-    if (quantidadeController.text.trim().isEmpty) {
+    if(quantidadeController.text.trim().isEmpty){
 
       mostrarMensagem(
         "Digite a quantidade.",
@@ -131,7 +150,7 @@ class _CadastroScreenState
 
 
 
-    if (horarioController.text.trim().isEmpty) {
+    if(horarioController.text.trim().isEmpty){
 
       mostrarMensagem(
         "Selecione o horário.",
@@ -143,7 +162,7 @@ class _CadastroScreenState
 
 
 
-    if (diasSelecionados.isEmpty) {
+    if(diasSelecionados.isEmpty){
 
       mostrarMensagem(
         "Selecione pelo menos um dia.",
@@ -155,23 +174,25 @@ class _CadastroScreenState
 
 
 
-    final int? quantidade =
 
+    final int? quantidade =
         int.tryParse(
           quantidadeController.text.trim(),
         );
 
 
 
-    if (quantidade == null || quantidade <= 0) {
+    if(quantidade == null || quantidade <= 0){
 
       mostrarMensagem(
-        "Digite uma quantidade válida.",
+        "Quantidade inválida.",
       );
 
       return;
 
     }
+
+
 
 
 
@@ -183,30 +204,39 @@ class _CadastroScreenState
 
 
 
-    try {
 
 
-      final String dias =
-
-          diasSelecionados.join(", ");
-
+    try{
 
 
       Remedio remedio = Remedio(
 
-        nome: nomeController.text.trim(),
+        nome:
+            nomeController.text.trim(),
 
-        quantidade: quantidade,
 
-        horario: horarioController.text.trim(),
+        quantidade:
+            quantidade,
 
-        motivo: motivoController.text.trim(),
 
-        dias: dias,
+        horario:
+            horarioController.text.trim(),
 
-        tomou: tomou ? 1 : 0,
+
+        motivo:
+            motivoController.text.trim(),
+
+
+        dias:
+            diasSelecionados.join(", "),
+
+
+        tomou:
+            tomou ? 1 : 0,
 
       );
+
+
 
 
 
@@ -215,13 +245,17 @@ class _CadastroScreenState
 
 
 
-      await handler.inserirRemedio(
-        remedio,
+
+      await handler.insertRemedio(
+        remedio as List<Remedio>,
       );
 
 
 
-      if (!mounted) return;
+
+
+      if(!mounted) return;
+
 
 
 
@@ -231,7 +265,9 @@ class _CadastroScreenState
 
 
 
+
       limparFormulario();
+
 
 
 
@@ -242,23 +278,26 @@ class _CadastroScreenState
 
 
 
-    } catch (erro) {
+
+    }catch(e){
 
 
       debugPrint(
-        "Erro ao salvar remédio: $erro",
+        "Erro ao salvar: $e",
       );
+
 
 
       mostrarMensagem(
-        "Erro ao salvar o remédio.",
+        "Erro ao salvar remédio.",
       );
 
 
-    } finally {
+
+    }finally{
 
 
-      if (mounted) {
+      if(mounted){
 
         setState(() {
 
@@ -268,7 +307,9 @@ class _CadastroScreenState
 
       }
 
+
     }
+
 
 
   }
@@ -278,7 +319,8 @@ class _CadastroScreenState
 
 
 
-  void limparFormulario() {
+
+  void limparFormulario(){
 
 
     nomeController.clear();
@@ -306,7 +348,9 @@ class _CadastroScreenState
 
 
 
-  void mostrarMensagem(String mensagem) {
+
+
+  void mostrarMensagem(String mensagem){
 
 
     ScaffoldMessenger.of(context)
@@ -314,7 +358,8 @@ class _CadastroScreenState
 
       SnackBar(
 
-        content: Text(mensagem),
+        content:
+            Text(mensagem),
 
       ),
 
@@ -329,51 +374,70 @@ class _CadastroScreenState
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
 
 
     return Scaffold(
 
+
       appBar: AppBar(
 
-        title: const Text(
-          "Cadastrar Remédio",
-        ),
+        title:
+            const Text(
+              "Cadastrar Remédio",
+            ),
 
       ),
+
+
 
 
 
       body: SingleChildScrollView(
 
 
-        padding: const EdgeInsets.all(20),
+        padding:
+            const EdgeInsets.all(20),
+
 
 
         child: Column(
+
 
 
           crossAxisAlignment:
               CrossAxisAlignment.stretch,
 
 
+
           children: [
+
 
 
 
             TextField(
 
-              controller: nomeController,
+
+              controller:
+                  nomeController,
 
 
-              decoration: InputDecoration(
+
+              decoration:
+                  InputDecoration(
+
 
                 labelText:
                     "Nome do Remédio",
 
+
+
                 hintText:
                     "Ex.: Dipirona",
+
 
 
                 prefixIcon:
@@ -382,6 +446,7 @@ class _CadastroScreenState
                     ),
 
 
+
                 border:
                     OutlineInputBorder(
 
@@ -396,30 +461,38 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height: 18),
+
+            const SizedBox(height:18),
+
 
 
 
 
             TextField(
 
+
               controller:
                   quantidadeController,
+
 
 
               keyboardType:
                   TextInputType.number,
 
 
+
               decoration:
                   InputDecoration(
+
 
                 labelText:
                     "Quantidade",
 
 
+
                 hintText:
                     "Ex.: 2",
+
 
 
                 prefixIcon:
@@ -428,6 +501,7 @@ class _CadastroScreenState
                     ),
 
 
+
                 border:
                     OutlineInputBorder(
 
@@ -444,33 +518,42 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height: 18),
+            const SizedBox(height:18),
+
 
 
 
 
             TextField(
 
+
               controller:
                   horarioController,
 
 
-              readOnly: true,
+
+              readOnly:
+                  true,
+
 
 
               onTap:
                   selecionarHorario,
 
 
+
               decoration:
                   InputDecoration(
+
 
                 labelText:
                     "Horário",
 
 
+
                 hintText:
                     "00:00",
+
 
 
                 prefixIcon:
@@ -479,6 +562,7 @@ class _CadastroScreenState
                     ),
 
 
+
                 border:
                     OutlineInputBorder(
 
@@ -494,29 +578,38 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height: 18),
+
+            const SizedBox(height:18),
+
 
 
 
 
             TextField(
 
+
               controller:
                   motivoController,
 
 
-              maxLines: 3,
+
+              maxLines:
+                  3,
+
 
 
               decoration:
                   InputDecoration(
 
+
                 labelText:
                     "Motivo",
 
 
+
                 hintText:
                     "Ex.: Dor de cabeça",
+
 
 
                 border:
@@ -534,7 +627,9 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height: 25),
+
+            const SizedBox(height:25),
+
 
 
 
@@ -547,7 +642,9 @@ class _CadastroScreenState
               style:
                   TextStyle(
 
-                fontSize: 18,
+                fontSize:
+                    18,
+
 
                 fontWeight:
                     FontWeight.bold,
@@ -559,51 +656,47 @@ class _CadastroScreenState
 
 
 
+
+
             ...diasSemana.map(
 
-              (dia) {
+              (dia)=>CheckboxListTile(
 
-
-                return CheckboxListTile(
-
-                  title:
-                      Text(dia),
-
-
-                  value:
-                      diasSelecionados.contains(dia),
+                title:
+                    Text(dia),
 
 
 
-                  onChanged:
-                      (valor) {
+                value:
+                    diasSelecionados.contains(dia),
 
 
-                    setState(() {
+
+                onChanged:
+                    (valor){
 
 
-                      if (valor == true) {
-
-                        diasSelecionados.add(dia);
+                  setState((){
 
 
-                      } else {
+                    if(valor == true){
 
-                        diasSelecionados.remove(dia);
+                      diasSelecionados.add(dia);
 
-                      }
+                    }else{
 
+                      diasSelecionados.remove(dia);
 
-                    });
-
-
-                  },
+                    }
 
 
-                );
+                  });
 
 
-              },
+                },
+
+
+              ),
 
             ),
 
@@ -623,16 +716,15 @@ class _CadastroScreenState
                   tomou,
 
 
+
               onChanged:
-                  (valor) {
+                  (valor){
 
-
-                setState(() {
+                setState((){
 
                   tomou = valor;
 
                 });
-
 
               },
 
@@ -643,14 +735,16 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height: 25),
+            const SizedBox(height:25),
+
 
 
 
 
             SizedBox(
 
-              height: 55,
+              height:
+                  55,
 
 
               child:
@@ -659,8 +753,8 @@ class _CadastroScreenState
 
                 onPressed:
                     salvando
-                        ? null
-                        : salvarRemedio,
+                    ? null
+                    : salvarRemedio,
 
 
 
@@ -670,30 +764,36 @@ class _CadastroScreenState
                   backgroundColor:
                       Colors.black,
 
+
                   foregroundColor:
                       Colors.white,
 
-
                 ),
+
 
 
 
                 child:
                     salvando
 
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
 
-                        : const Text(
-                            "SALVAR REMÉDIO",
-                            style:
-                                TextStyle(
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
-                          ),
 
+                    : const Text(
+
+                        "SALVAR REMÉDIO",
+
+                        style:
+                            TextStyle(
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                        ),
+
+                      ),
 
               ),
 
@@ -703,12 +803,9 @@ class _CadastroScreenState
 
           ],
 
-
         ),
 
-
       ),
-
 
     );
 
