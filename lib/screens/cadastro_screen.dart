@@ -17,8 +17,7 @@ class CadastroScreen extends StatefulWidget {
 
 
 
-class _CadastroScreenState
-    extends State<CadastroScreen> {
+class _CadastroScreenState extends State<CadastroScreen> {
 
 
   final TextEditingController nomeController =
@@ -64,16 +63,12 @@ class _CadastroScreenState
 
 
   @override
-  void dispose() {
+  void dispose(){
 
     nomeController.dispose();
-
     quantidadeController.dispose();
-
     horarioController.dispose();
-
     motivoController.dispose();
-
 
     super.dispose();
 
@@ -83,25 +78,24 @@ class _CadastroScreenState
 
 
 
-
   Future<void> selecionarHorario() async {
 
 
-    final TimeOfDay? horario =
+    TimeOfDay? horario =
         await showTimePicker(
 
-          context: context,
+      context: context,
 
-          initialTime:
-              TimeOfDay.now(),
+      initialTime:
+          TimeOfDay.now(),
 
-        );
+    );
 
 
 
     if(horario != null){
 
-      setState(() {
+      setState((){
 
         horarioController.text =
             horario.format(context);
@@ -128,8 +122,8 @@ class _CadastroScreenState
 
     if(nomeController.text.trim().isEmpty){
 
-      mostrarMensagem(
-        "Digite o nome do remédio.",
+      mensagem(
+        "Digite o nome do remédio",
       );
 
       return;
@@ -140,8 +134,8 @@ class _CadastroScreenState
 
     if(quantidadeController.text.trim().isEmpty){
 
-      mostrarMensagem(
-        "Digite a quantidade.",
+      mensagem(
+        "Digite a quantidade",
       );
 
       return;
@@ -152,8 +146,8 @@ class _CadastroScreenState
 
     if(horarioController.text.trim().isEmpty){
 
-      mostrarMensagem(
-        "Selecione o horário.",
+      mensagem(
+        "Selecione o horário",
       );
 
       return;
@@ -164,8 +158,8 @@ class _CadastroScreenState
 
     if(diasSelecionados.isEmpty){
 
-      mostrarMensagem(
-        "Selecione pelo menos um dia.",
+      mensagem(
+        "Selecione os dias",
       );
 
       return;
@@ -175,17 +169,18 @@ class _CadastroScreenState
 
 
 
-    final int? quantidade =
+
+    int? quantidade =
         int.tryParse(
-          quantidadeController.text.trim(),
+          quantidadeController.text,
         );
 
 
 
-    if(quantidade == null || quantidade <= 0){
+    if(quantidade == null){
 
-      mostrarMensagem(
-        "Quantidade inválida.",
+      mensagem(
+        "Quantidade inválida",
       );
 
       return;
@@ -196,7 +191,7 @@ class _CadastroScreenState
 
 
 
-    setState(() {
+    setState((){
 
       salvando = true;
 
@@ -220,11 +215,11 @@ class _CadastroScreenState
 
 
         horario:
-            horarioController.text.trim(),
+            horarioController.text,
 
 
         motivo:
-            motivoController.text.trim(),
+            motivoController.text,
 
 
         dias:
@@ -234,20 +229,20 @@ class _CadastroScreenState
         tomou:
             tomou ? 1 : 0,
 
+
       );
 
 
 
 
-
-      DatabaseHandler handler =
+      DatabaseHandler banco =
           DatabaseHandler();
 
 
 
 
-      await handler.insertRemedio(
-        remedio as List<Remedio>,
+      await banco.insertRemedio(
+        remedio,
       );
 
 
@@ -259,15 +254,9 @@ class _CadastroScreenState
 
 
 
-      mostrarMensagem(
-        "Remédio cadastrado com sucesso!",
+      mensagem(
+        "Remédio salvo!",
       );
-
-
-
-
-      limparFormulario();
-
 
 
 
@@ -282,16 +271,9 @@ class _CadastroScreenState
     }catch(e){
 
 
-      debugPrint(
+      mensagem(
         "Erro ao salvar: $e",
       );
-
-
-
-      mostrarMensagem(
-        "Erro ao salvar remédio.",
-      );
-
 
 
     }finally{
@@ -299,7 +281,7 @@ class _CadastroScreenState
 
       if(mounted){
 
-        setState(() {
+        setState((){
 
           salvando = false;
 
@@ -311,7 +293,6 @@ class _CadastroScreenState
     }
 
 
-
   }
 
 
@@ -320,37 +301,7 @@ class _CadastroScreenState
 
 
 
-  void limparFormulario(){
-
-
-    nomeController.clear();
-
-    quantidadeController.clear();
-
-    horarioController.clear();
-
-    motivoController.clear();
-
-
-
-    setState(() {
-
-      diasSelecionados.clear();
-
-      tomou = false;
-
-    });
-
-
-  }
-
-
-
-
-
-
-
-  void mostrarMensagem(String mensagem){
+  void mensagem(String texto){
 
 
     ScaffoldMessenger.of(context)
@@ -359,7 +310,7 @@ class _CadastroScreenState
       SnackBar(
 
         content:
-            Text(mensagem),
+            Text(texto),
 
       ),
 
@@ -367,7 +318,6 @@ class _CadastroScreenState
 
 
   }
-
 
 
 
@@ -394,9 +344,8 @@ class _CadastroScreenState
 
 
 
-
-
-      body: SingleChildScrollView(
+      body:
+      SingleChildScrollView(
 
 
         padding:
@@ -404,13 +353,8 @@ class _CadastroScreenState
 
 
 
-        child: Column(
-
-
-
-          crossAxisAlignment:
-              CrossAxisAlignment.stretch,
-
+        child:
+        Column(
 
 
           children: [
@@ -420,41 +364,14 @@ class _CadastroScreenState
 
             TextField(
 
-
               controller:
                   nomeController,
 
 
-
               decoration:
-                  InputDecoration(
-
-
-                labelText:
-                    "Nome do Remédio",
-
-
-
-                hintText:
-                    "Ex.: Dipirona",
-
-
-
-                prefixIcon:
-                    const Icon(
-                      Icons.medication,
-                    ),
-
-
-
-                border:
-                    OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(12),
-
-                ),
-
+              campo(
+                "Nome do Remédio",
+                Icons.medication,
               ),
 
             ),
@@ -462,7 +379,7 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height:18),
+            const SizedBox(height:20),
 
 
 
@@ -470,46 +387,18 @@ class _CadastroScreenState
 
             TextField(
 
-
               controller:
                   quantidadeController,
-
 
 
               keyboardType:
                   TextInputType.number,
 
 
-
               decoration:
-                  InputDecoration(
-
-
-                labelText:
-                    "Quantidade",
-
-
-
-                hintText:
-                    "Ex.: 2",
-
-
-
-                prefixIcon:
-                    const Icon(
-                      Icons.numbers,
-                    ),
-
-
-
-                border:
-                    OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(12),
-
-                ),
-
+              campo(
+                "Quantidade",
+                Icons.numbers,
               ),
 
             ),
@@ -518,59 +407,29 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height:18),
-
+            const SizedBox(height:20),
 
 
 
 
             TextField(
 
-
               controller:
                   horarioController,
-
 
 
               readOnly:
                   true,
 
 
-
               onTap:
                   selecionarHorario,
 
 
-
               decoration:
-                  InputDecoration(
-
-
-                labelText:
-                    "Horário",
-
-
-
-                hintText:
-                    "00:00",
-
-
-
-                prefixIcon:
-                    const Icon(
-                      Icons.access_time,
-                    ),
-
-
-
-                border:
-                    OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(12),
-
-                ),
-
+              campo(
+                "Horário",
+                Icons.access_time,
               ),
 
             ),
@@ -579,47 +438,25 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height:18),
-
+            const SizedBox(height:20),
 
 
 
 
             TextField(
 
-
               controller:
                   motivoController,
-
 
 
               maxLines:
                   3,
 
 
-
               decoration:
-                  InputDecoration(
-
-
-                labelText:
-                    "Motivo",
-
-
-
-                hintText:
-                    "Ex.: Dor de cabeça",
-
-
-
-                border:
-                    OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(12),
-
-                ),
-
+              campo(
+                "Motivo",
+                Icons.note,
               ),
 
             ),
@@ -628,9 +465,7 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height:25),
-
-
+            const SizedBox(height:20),
 
 
 
@@ -640,19 +475,12 @@ class _CadastroScreenState
               "Dias da semana",
 
               style:
-                  TextStyle(
-
-                fontSize:
-                    18,
-
-
-                fontWeight:
-                    FontWeight.bold,
-
+              TextStyle(
+                fontSize:18,
+                fontWeight:FontWeight.bold,
               ),
 
             ),
-
 
 
 
@@ -666,18 +494,14 @@ class _CadastroScreenState
                     Text(dia),
 
 
-
                 value:
                     diasSelecionados.contains(dia),
 
 
-
                 onChanged:
-                    (valor){
-
+                (valor){
 
                   setState((){
-
 
                     if(valor == true){
 
@@ -704,27 +528,28 @@ class _CadastroScreenState
 
 
 
+
             SwitchListTile(
 
               title:
-                  const Text(
-                    "Já tomou este remédio?",
-                  ),
+              const Text(
+                "Já tomou?",
+              ),
 
 
               value:
                   tomou,
 
 
-
               onChanged:
-                  (valor){
+              (valor){
 
                 setState((){
 
                   tomou = valor;
 
                 });
+
 
               },
 
@@ -735,7 +560,9 @@ class _CadastroScreenState
 
 
 
-            const SizedBox(height:25),
+
+
+            const SizedBox(height:20),
 
 
 
@@ -743,72 +570,103 @@ class _CadastroScreenState
 
             SizedBox(
 
+              width:
+                  double.infinity,
+
+
               height:
                   55,
 
 
               child:
-                  ElevatedButton(
+              ElevatedButton(
 
 
                 onPressed:
-                    salvando
-                    ? null
-                    : salvarRemedio,
+                salvando
+                ? null
+                : salvarRemedio,
 
 
 
                 style:
-                    ElevatedButton.styleFrom(
+                ElevatedButton.styleFrom(
 
                   backgroundColor:
-                      Colors.black,
-
+                  Colors.black,
 
                   foregroundColor:
-                      Colors.white,
+                  Colors.white,
 
                 ),
 
 
 
-
                 child:
-                    salvando
 
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
+                salvando
+
+                ?
+                const CircularProgressIndicator(
+                  color: Colors.white,
+                )
 
 
-                    : const Text(
+                :
 
-                        "SALVAR REMÉDIO",
+                const Text(
+                  "SALVAR REMÉDIO",
+                ),
 
-                        style:
-                            TextStyle(
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                        ),
-
-                      ),
 
               ),
 
-            ),
+
+            )
+
 
 
 
           ],
 
+
         ),
+
+
+      ),
+
+
+    );
+
+
+  }
+
+
+
+
+
+  InputDecoration campo(
+      String texto,
+      IconData icone
+      ){
+
+    return InputDecoration(
+
+      labelText:
+          texto,
+
+      prefixIcon:
+          Icon(icone),
+
+      border:
+      OutlineInputBorder(
+
+        borderRadius:
+        BorderRadius.circular(12),
 
       ),
 
     );
-
 
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/inicio_screen.dart';
 import 'screens/detalhes_screen.dart';
@@ -25,7 +24,6 @@ class MediLifeApp extends StatelessWidget {
       title: 'MedLife',
       initialRoute: '/splash',
       routes: {
-        '/splash': (context) => const SplashScreen(),
         '/login': (context) => LoginScreen(),
         '/': (context) => InicioScreen(),
         '/detalhes': (context) => DetalhesScreen(),

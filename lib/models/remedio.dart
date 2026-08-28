@@ -1,43 +1,71 @@
 class Remedio {
   final int? id;
+
   final String nome;
+
   final int quantidade;
+
   final String horario;
+
   final String motivo;
+
   final String dias;
+
   final int tomou;
 
   Remedio({
     this.id,
+
     required this.nome,
+
     required this.quantidade,
+
     required this.horario,
+
     required this.motivo,
+
     required this.dias,
+
     required this.tomou,
   });
 
+  // Banco -> Objeto Dart
 
-  // Pega os dados do banco e transforma em objeto Remedio
-  Remedio.fromMap(Map<String, dynamic> res)
-      : id = res["id"],
-        nome = res["nome"],
-        quantidade = res["quantidade"],
-        horario = res["horario"],
-        motivo = res["motivo"],
-        dias = res["dias"],
-        tomou = res["tomou"];
+  factory Remedio.fromMap(Map<String, dynamic> res) {
+    return Remedio(
+      id: res["id"],
 
+      nome: res["nome"] ?? "",
 
-  // Transforma o objeto Remedio em dados para salvar no banco
+      quantidade: res["quantidade"] ?? 0,
+
+      horario: res["horario"] ?? "",
+
+      motivo: res["motivo"] ?? "",
+
+      dias: res["dias"] ?? "",
+
+      tomou: res["tomou"] ?? 0,
+    );
+  }
+
+  // Objeto Dart -> Banco
+
   Map<String, Object?> toMap() {
     return {
-      "id": id,
+      // Não precisa enviar o id
+      // SQLite cria automaticamente
+
       "nome": nome,
+
       "quantidade": quantidade,
+
       "horario": horario,
+
       "motivo": motivo,
+
       "dias": dias,
+
       "tomou": tomou,
     };
   }
