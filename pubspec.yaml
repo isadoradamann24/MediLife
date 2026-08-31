@@ -1,4 +1,4 @@
-name: MedLife
+name: MediLife
 description: "Controle seus medicamentos com facilidade."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -42,7 +42,7 @@ dependencies:
   flutter_launcher_icons: 0.14.4
 
 flutter_native_splash:
-  color: "#fffff"
+  color: "#ffffff"
   image: "assets/app/logo.png"
   android: true
   ios: true

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
-import 'screens/inicio_screen.dart';
 import 'screens/detalhes_screen.dart';
 import 'screens/estatisticas_screen.dart';
 import 'screens/cadastro_screen.dart';
@@ -22,13 +21,12 @@ class MediLifeApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MedLife',
-      initialRoute: '/splash',
       routes: {
         '/login': (context) => LoginScreen(),
-        '/': (context) => InicioScreen(),
+        '/': (context) => CadastroScreen(),
         '/detalhes': (context) => DetalhesScreen(),
         '/estatisticas': (context) => EstatisticasScreen(),
-        '/cadastro': (context) => CadastroScreen(),
+       // '/cadastro': (context) => CadastroScreen(),
         '/calculadora': (context) => CalculadoraScreen(),
       },
     );
