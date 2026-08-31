@@ -15,7 +15,7 @@ class _EstatisticasScreenState extends State<EstatisticasScreen>
   late AnimationController _controller;
   late Animation<double> _fade;
   late Animation<double> _scale;
-
+  
   @override
   void initState() {
     super.initState();

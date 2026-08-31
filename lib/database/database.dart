@@ -3,8 +3,8 @@ import 'package:path/path.dart';
 
 import '../models/remedio.dart';
 
-class DatabaseHandler {
-
+class DatabaseHandler { 
+  
   //Iniciar/criar banco de dados 
   Future<Database> initializeDB() async {
     final String path = await getDatabasesPath();
@@ -29,6 +29,7 @@ class DatabaseHandler {
     );
   }
 
+  // CRUD
   //Inserir na tabela
   Future<int> insertRemedio(Remedio remedio) async {
     final Database db = await initializeDB();
@@ -55,7 +56,7 @@ class DatabaseHandler {
     return linhasAfetadas;
   }
 
-  //Mostrar os remédios
+  //Mostrar/carregar os remédios
   Future<List<Remedio>> retrieveRemedios() async {
     final Database db = await initializeDB();
 

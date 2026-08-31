@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database.dart';
 import '../models/remedio.dart';
@@ -35,6 +36,9 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
         remedios = lista;
         carregando = false;
       });
+
+      // Mantém a flag possuiRemedio sincronizada com o banco
+      await _atualizarPossuiRemedio(lista.isNotEmpty);
     } catch (e) {
       if (!mounted) return;
 
@@ -48,6 +52,12 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
         ),
       );
     }
+  }
+
+  // Atualiza a flag usada pelo Drawer para exibir/ocultar "Meus Remédios"
+  Future<void> _atualizarPossuiRemedio(bool possui) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('possuiRemedio', possui);
   }
 
   // Exclui um remédio
@@ -134,8 +144,27 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 235, 245, 245),
+
       appBar: AppBar(
-        title: const Text('Meus Remédios'),
+        backgroundColor: const Color.fromARGB(255, 0, 90, 110),
+
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Início',
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/',
+              (route) => false,
+            );
+          },
+        ),
+
+        title: const Text(
+          'Meus Remédios',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
 
         actions: [
           IconButton(
@@ -352,6 +381,25 @@ class _DetalhesScreenState extends State<DetalhesScreen> {
 
               style: TextStyle(
                 color: Colors.grey.shade600,
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 14,
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Voltar',
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],

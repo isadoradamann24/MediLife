@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/remedio.dart';
 import '../database/database.dart';
 import 'detalhes_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CadastroScreen extends StatefulWidget {
   // Se vier preenchido, a tela abre em modo de edição
@@ -52,6 +53,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
   // Controle do botão
   bool salvando = false;
 
+  // Controla se a opção "Meus Remédios" aparece no menu
+  bool possuiRemedio = false;
+
   bool get editando => widget.remedioEditar != null;
 
   // Animação das frases
@@ -82,6 +86,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
       );
     }
 
+    // Verifica se já existe algum remédio salvo
+    _carregarPossuiRemedio();
+
     // Animação da frase
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 4));
@@ -93,6 +100,18 @@ class _CadastroScreenState extends State<CadastroScreen> {
       });
 
       return true;
+    });
+  }
+
+  //Shared Preferences
+  Future<void> _carregarPossuiRemedio() async {
+    final prefs = await SharedPreferences.getInstance();
+    final valor = prefs.getBool('possuiRemedio') ?? false;
+
+    if (!mounted) return;
+
+    setState(() {
+      possuiRemedio = valor;
     });
   }
 
@@ -118,7 +137,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
       });
     }
   }
-
+  // Vai chamar os metódos do DATABASE
   Future<void> salvarRemedio() async {
     if (salvando) return;
 
@@ -148,6 +167,16 @@ class _CadastroScreenState extends State<CadastroScreen> {
         await banco.updateRemedio(remedio);
       } else {
         await banco.insertRemedio(remedio);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('possuiRemedio', true);
+
+        // Atualiza o menu imediatamente após salvar o primeiro remédio
+        if (mounted) {
+          setState(() {
+            possuiRemedio = true;
+          });
+        }
       }
 
       if (!mounted) return;
@@ -263,15 +292,18 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
             const Divider(),
 
-            ListTile(
-              leading: const Icon(Icons.medication),
-              title: const Text("Meus Remédios"),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/detalhes');
-              },
-            ),
+            //Verifica se ela possui remedio.
+            if (possuiRemedio) ...[
+              ListTile(
+                leading: const Icon(Icons.medication),
+                title: const Text("Meus Remédios"),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/detalhes');
+                },
+              ),
 
-            const Divider(),
+              const Divider(),
+            ],
 
             ListTile(
               leading: const Icon(
