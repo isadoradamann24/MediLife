@@ -319,6 +319,19 @@ class _CadastroScreenState extends State<CadastroScreen> {
             const Divider(),
 
             ListTile(
+              leading: const Icon(
+                Icons.calculate,
+                color: Color.fromARGB(255, 41, 40, 40),
+              ),
+              title: const Text("Buscar Remédios"),
+              onTap: () {
+                Navigator.pushNamed(context, '/buscar_remedio');
+              },
+            ),
+
+            const Divider(),
+
+            ListTile(
               leading: const Icon(Icons.login),
               title: const Text("Login"),
               onTap: () {

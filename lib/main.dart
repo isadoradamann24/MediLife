@@ -5,6 +5,7 @@ import 'screens/detalhes_screen.dart';
 import 'screens/estatisticas_screen.dart';
 import 'screens/cadastro_screen.dart';
 import 'screens/calculadora_screen.dart';
+import 'screens/buscar_remedico.dart';
 
 String emailCadastrado = '';
 String senhaCadastrada = '';
@@ -28,6 +29,7 @@ class MediLifeApp extends StatelessWidget {
         '/estatisticas': (context) => EstatisticasScreen(),
        // '/cadastro': (context) => CadastroScreen(),
         '/calculadora': (context) => CalculadoraScreen(),
+        '/buscar_remedio': (context) => BuscarRemedio(),
       },
     );
   }
